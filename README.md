@@ -16,3 +16,14 @@ Tente executar o Kata nos seguintes passos:
 
 ## Regras do repositório
 A branch main existe apenas para o arquivo README.md que explica o Kata. Crie uma branch e implemente apenas nessa branch. Não haverá merge. A ideia é que o Kata seja genérico o suficiente para ser implementado em qualquer linguagem.
+
+
+### Modelagem
+O jogo vai ter 3 entidades.
+- Board: É a entidade que representa a matriz 3x3 do jogo da velha. Ela conterá as regras de negócio relacionadas ao tabuleiro, a saber: 
+  - iniciar os campos com valores zerados
+  - permitir alguém marcar um campo do tabuleiro
+  - garantir que ninguém marque um campo já marcado
+  - verificar se as ordem das marcações configuram um ganhador ou um empate
+- Game: É a entidade que guarda o estado do jogo e suas interações. Guarda as instâncias dos jogadores, um tabuleiro relacionado àquele jogo, qual o turno e se o jogo está em execução ou já terminou
+- Main: orienta a lógica do jogo para sua execução. Interage com os usuários, recebendo os inputs e apresentando o estado do jogo à medida que ele acontece.
