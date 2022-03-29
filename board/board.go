@@ -19,6 +19,10 @@ func (b *Board) Init() {
 }
 
 func (b *Board) Mark(x, y int, mark string) error {
+	if x < 0 || x > 2 ||
+		y < 0 || y > 2 {
+		return errors.New("invalid position")
+	}
 	if b.fields[x][y] != emptyMark {
 		return errors.New("you could not mark a field that already is marked")
 	}

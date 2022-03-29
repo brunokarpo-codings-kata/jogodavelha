@@ -50,3 +50,25 @@ func Test_ShouldNotAllowToMarkAValidFieldThatAlreadyBeMarked(t *testing.T) {
 		}
 	}
 }
+
+func Test_ShouldNotAllowMarkingInvalidNegativePositionFields(t *testing.T) {
+	b := Board{}
+	b.Init()
+	mark := "X"
+
+	err := b.Mark(-1, -1, mark)
+	if err == nil {
+		t.Errorf(`should not allow to mark invalid field [-1][-1]`)
+	}
+}
+
+func Test_ShouldNotAllowMarkingInvalidPositivePositionFields(t *testing.T) {
+	b := Board{}
+	b.Init()
+	mark := "X"
+
+	err := b.Mark(3, 3, mark)
+	if err == nil {
+		t.Errorf(`should not allow to mark invalid field [3][3]`)
+	}
+}
