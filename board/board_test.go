@@ -10,7 +10,7 @@ func Test_ShouldInitABoardWithAllFieldsEmpty(t *testing.T) {
 
 	for x, column := range b.fields {
 		for y, cel := range column {
-			if cel != "-" {
+			if cel != emptyMark {
 				t.Errorf(`field [%v][%v] should be initialized with empty value. Expected: %v, got: %v`, x, y, "-", cel)
 			}
 		}
@@ -41,9 +41,9 @@ func Test_ShouldNotAllowToMarkAValidFieldThatAlreadyBeMarked(t *testing.T) {
 
 	for i := 0; i < 3; i++ {
 		for j := 0; j < 3; j++ {
-			b.Mark(i, j, mark) // valid marking
+			err := b.Mark(i, j, mark) // valid marking
 
-			err := b.Mark(i, j, mark2) // invalid marking
+			err = b.Mark(i, j, mark2) // invalid marking
 			if err == nil {
 				t.Errorf(`should not allow to mark the field [%v][%v] with mark [%v]. Expected error, and the field should have value '%v', but got %v`, i, j, mark2, mark, b.fields[i][j])
 			}
