@@ -1,74 +1,182 @@
 package board
 
-import (
-	"testing"
-)
+import "testing"
 
-func Test_ShouldInitABoardWithAllFieldsEmpty(t *testing.T) {
-	b := Board{}
-	b.Init()
+func TestBoard_Mark(t *testing.T) {
+	t.Run("should mark all valid fields", func(t *testing.T) {
+		b := Init()
+		for x := 0; x < 3; x++ {
+			for y := 0; y < 3; y++ {
+				mark := "X"
+				_ = b.Mark(x, y, mark)
 
-	for x, column := range b.fields {
-		for y, cel := range column {
-			if cel != emptyMark {
-				t.Errorf(`field [%v][%v] should be initialized with empty value. Expected: %v, got: %v`, x, y, "-", cel)
+				if b.fields[x][y] != mark {
+					t.Logf("error: field [%v][%v] should have value '%v', but got: '%v'", x, y, mark, b.fields[x][y])
+					t.Fail()
+				}
 			}
 		}
-	}
-}
+	})
+	t.Run("Should not mark negative indexes field", func(t *testing.T) {
+		b := Init()
+		for x := -1; x > -10; x-- {
+			for y := -1; y > -10; y-- {
+				mark := "X"
 
-func Test_ShouldAllowMarkAValidEmptyFieldOnTheBoard(t *testing.T) {
-	b := Board{}
-	b.Init()
-	mark := "X"
-
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			b.Mark(i, j, mark)
-
-			if b.fields[i][j] != mark {
-				t.Errorf(`The field [%v][%v] was not marked properly. Expected '%v', but got '%v'`, i, j, mark, b.fields[i][j])
+				err := b.Mark(x, y, mark)
+				if err == nil {
+					t.Logf("expected error while trying to mark field [%v][%v], but not occours", x, y)
+					t.Fail()
+				}
 			}
 		}
-	}
-}
+	})
+	t.Run("Should not mark invalid positive fields", func(t *testing.T) {
+		b := Init()
+		for x := 4; x < 10; x++ {
+			for y := 4; y < 10; y++ {
+				mark := "X"
 
-func Test_ShouldNotAllowToMarkAValidFieldThatAlreadyBeMarked(t *testing.T) {
-	b := Board{}
-	b.Init()
-	mark := "X"
-	mark2 := "O"
-
-	for i := 0; i < 3; i++ {
-		for j := 0; j < 3; j++ {
-			err := b.Mark(i, j, mark) // valid marking
-
-			err = b.Mark(i, j, mark2) // invalid marking
-			if err == nil {
-				t.Errorf(`should not allow to mark the field [%v][%v] with mark [%v]. Expected error, and the field should have value '%v', but got %v`, i, j, mark2, mark, b.fields[i][j])
+				err := b.Mark(x, y, mark)
+				if err == nil {
+					t.Logf("expected error while trying to mark field [%v][%v], but not occours", x, y)
+					t.Fail()
+				}
 			}
 		}
-	}
+	})
+	t.Run("Should not mark an already marked field", func(t *testing.T) {
+		b := Init()
+
+		for x := 0; x < 3; x++ {
+			for y := 0; y < 3; y++ {
+				mark := "X"
+				_ = b.Mark(x, y, mark)
+
+				mark2 := "O"
+				err := b.Mark(x, y, mark2)
+				if err == nil {
+					t.Logf("expected error. the field [%v][%v] should be marked with '%v', but got '%v'", x, y, mark, b.fields[x][y])
+					t.Fail()
+				}
+			}
+		}
+	})
 }
 
-func Test_ShouldNotAllowMarkingInvalidNegativePositionFields(t *testing.T) {
-	b := Board{}
-	b.Init()
-	mark := "X"
+func TestBoard_Win(t *testing.T) {
+	t.Run("empty board should not have winner", func(t *testing.T) {
+		b := Init()
+		win, mark, _ := b.Win()
+		if win {
+			t.Log("error: the board should not have winner")
+			t.Fail()
+		}
+		if mark == "-" {
+			t.Logf("The mark '%v' is not a valid mark to win the game", mark)
+			t.Fail()
+		}
+	})
+	t.Run("should win in horizontal", func(t *testing.T) {
+		mark := "X"
 
-	err := b.Mark(-1, -1, mark)
-	if err == nil {
-		t.Errorf(`should not allow to mark invalid field [-1][-1]`)
-	}
-}
+		for x := 0; x < 3; x++ {
+			b := Init()
 
-func Test_ShouldNotAllowMarkingInvalidPositivePositionFields(t *testing.T) {
-	b := Board{}
-	b.Init()
-	mark := "X"
+			for y := 0; y < 3; y++ {
+				_ = b.Mark(x, y, mark)
+			}
 
-	err := b.Mark(3, 3, mark)
-	if err == nil {
-		t.Errorf(`should not allow to mark invalid field [3][3]`)
-	}
+			win, m, _ := b.Win()
+
+			if !win {
+				t.Log("error: the board should have a winner")
+				t.Fail()
+			}
+			if m != mark {
+				t.Logf("The mark '%v' should won the game, but got the mark '%v'", mark, m)
+			}
+		}
+	})
+	t.Run("should win in vertical", func(t *testing.T) {
+		mark := "O"
+
+		for y := 0; y < 3; y++ {
+			b := Init()
+
+			for x := 0; x < 3; x++ {
+				_ = b.Mark(x, y, mark)
+			}
+
+			win, m, _ := b.Win()
+
+			if !win {
+				t.Log("error: the board should have a winner")
+				t.Fail()
+			}
+			if m != mark {
+				t.Logf("The mark '%v' should won the game, but got the mark '%v'", mark, m)
+			}
+		}
+	})
+	t.Run("Should win in diagonal right", func(t *testing.T) {
+		mark := "B"
+
+		b := Init()
+
+		for i := 0; i < 3; i++ {
+			_ = b.Mark(i, i, mark)
+		}
+
+		win, m, _ := b.Win()
+
+		if !win {
+			t.Log("error: the board should have a winner")
+			t.Fail()
+		}
+		if m != mark {
+			t.Logf("The mark '%v' should won the game, but got the mark '%v'", mark, m)
+		}
+	})
+	t.Run("should win in diagonal left", func(t *testing.T) {
+		mark := "S"
+
+		b := Init()
+
+		for x, y := 0, 2; x < 3; x, y = x+1, y-1 {
+			_ = b.Mark(x, y, mark)
+		}
+
+		win, m, _ := b.Win()
+
+		if !win {
+			t.Log("error: the board should have a winner")
+			t.Fail()
+		}
+		if m != mark {
+			t.Logf("The mark '%v' should won the game, but got the mark '%v'", mark, m)
+		}
+	})
+	t.Run("Should fail if all field is filled and no winner", func(t *testing.T) {
+		b := Init()
+		b.fields = fields{
+			{"X", "O", "O"},
+			{"O", "O", "X"},
+			{"X", "X", "O"},
+		}
+
+		win, mark, err := b.Win()
+		if win {
+			t.Log("error: the board should not have winner")
+			t.Fail()
+		}
+		if mark != "" {
+			t.Logf("The mark '%v' is not a valid mark to win the game", mark)
+			t.Fail()
+		}
+		if err == nil {
+			t.Logf("error expected when field is fully filled and no winner mark")
+			t.Fail()
+		}
+	})
 }
