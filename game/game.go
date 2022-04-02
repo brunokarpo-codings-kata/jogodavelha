@@ -30,3 +30,8 @@ func (g *Game) GetTheTurnPlayer() player.Player {
 func (g *Game) switchTurnPlayer() {
 	g.players[indexTurnPlayer], g.players[indexWaitingPlayer] = g.players[indexWaitingPlayer], g.players[indexTurnPlayer]
 }
+
+func (g *Game) markField(x, y int) error {
+	err := g.board.Mark(x, y, g.players[0].Mark)
+	return err
+}

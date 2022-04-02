@@ -8,5 +8,5 @@ type MockGameWrapper struct {
 
 func (w *MockGameWrapper) Mark(x, y int, mark string) error {
 	args := w.Called(x, y, mark)
-	return args.Get(0).(error)
+	return args.Error(0)
 }

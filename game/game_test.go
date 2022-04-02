@@ -1,7 +1,10 @@
 package game
 
 import (
+	"errors"
+	"github.com/brunokarpo-codings-kata/jogodavelha/game/mocks"
 	"github.com/brunokarpo-codings-kata/jogodavelha/player"
+	"github.com/stretchr/testify/assert"
 	"testing"
 )
 
@@ -20,10 +23,7 @@ func TestGame_GetTheTurnPlayer(t *testing.T) {
 
 		p := g.GetTheTurnPlayer()
 
-		if p != player1 {
-			t.Logf("error: the first turn player should be %v, but got %v", player1, p)
-			t.Fail()
-		}
+		assert.Equal(t, player1, p)
 	})
 	t.Run("should switch the turn player", func(t *testing.T) {
 		g := Init(&player1, &player2, nil)
@@ -34,10 +34,7 @@ func TestGame_GetTheTurnPlayer(t *testing.T) {
 		// validating
 		p := g.GetTheTurnPlayer()
 
-		if p != player2 {
-			t.Logf("error: the turn player should be %v, but got %v", player2, p)
-			t.Fail()
-		}
+		assert.Equal(t, player2, p)
 	})
 	t.Run("should switch the turn player twice backing to the first player", func(t *testing.T) {
 		g := Init(&player1, &player2, nil)
@@ -49,20 +46,26 @@ func TestGame_GetTheTurnPlayer(t *testing.T) {
 		// validating
 		p := g.GetTheTurnPlayer()
 
-		if p != player1 {
-			t.Logf("error: the turn player should be %v, but got %v", player1, p)
-			t.Fail()
-		}
+		assert.Equal(t, player1, p)
 	})
 }
 
-//
-//func TestGame_MarkField(t *testing.T) {
-//	testWrapper := new(mocks.MockGameWrapper)
-//	x, y := 0, 0
-//	t.Run("turn player should mark a valid field", func(t *testing.T) {
-//		g := Init(&player1, &player2, testWrapper)
-//		testWrapper.On("Mark", x, y, player1.Mark).Return(nil).Once()
-//		g.markField()
-//	})
-//}
+func TestGame_MarkField(t *testing.T) {
+	testWrapper := new(mocks.MockGameWrapper)
+	x, y := 0, 0
+	t.Run("turn player should mark a valid field", func(t *testing.T) {
+		g := Init(&player1, &player2, testWrapper)
+		testWrapper.On("Mark", x, y, player1.Mark).Return(nil).Once()
+		err := g.markField(x, y)
+		testWrapper.AssertExpectations(t)
+		assert.Nil(t, err)
+	})
+	t.Run("turn player should not mark a invalid field", func(t *testing.T) {
+		g := Init(&player1, &player2, testWrapper)
+		expectedError := errors.New("field already marked or invalid")
+		testWrapper.On("Mark", x, y, player1.Mark).Return(expectedError).Once()
+		err := g.markField(x, y)
+		testWrapper.AssertExpectations(t)
+		assert.Equal(t, expectedError, err)
+	})
+}
