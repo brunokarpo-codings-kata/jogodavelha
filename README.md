@@ -27,3 +27,8 @@ O jogo vai ter 3 entidades.
   - verificar se as ordem das marcações configuram um ganhador ou um empate
 - Game: É a entidade que guarda o estado do jogo e suas interações. Guarda as instâncias dos jogadores, um tabuleiro relacionado àquele jogo, qual o turno e se o jogo está em execução ou já terminou
 - Main: orienta a lógica do jogo para sua execução. Interage com os usuários, recebendo os inputs e apresentando o estado do jogo à medida que ele acontece.
+
+
+### Some sources to learn
+[Golang with TDD](https://williaminfante.medium.com/golang-testing-with-tdd-e548d8be776)  
+[Golang testing: mocking and error handler](https://williaminfante.medium.com/golang-testing-mocking-and-error-handling-fbfe7f6008b9)
