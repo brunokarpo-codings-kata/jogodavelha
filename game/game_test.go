@@ -2,11 +2,25 @@ package game
 
 import (
 	"errors"
-	"github.com/brunokarpo-codings-kata/jogodavelha/game/mocks"
 	"github.com/brunokarpo-codings-kata/jogodavelha/player"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"testing"
 )
+
+type MockGameWrapper struct {
+	mock.Mock
+}
+
+func (w *MockGameWrapper) Mark(x, y int, mark string) error {
+	args := w.Called(x, y, mark)
+	return args.Error(0)
+}
+
+func (w *MockGameWrapper) Win() (bool, string, error) {
+	args := w.Called()
+	return args.Bool(0), args.String(1), args.Error(2)
+}
 
 var player1 = player.Player{
 	Name: "player1",
@@ -51,7 +65,7 @@ func TestGame_GetTheTurnPlayer(t *testing.T) {
 }
 
 func TestGame_MarkField(t *testing.T) {
-	testWrapper := new(mocks.MockGameWrapper)
+	testWrapper := new(MockGameWrapper)
 	x, y := 0, 0
 	t.Run("turn player should mark a valid field", func(t *testing.T) {
 		g := Init(&player1, &player2, testWrapper)
@@ -67,5 +81,23 @@ func TestGame_MarkField(t *testing.T) {
 		err := g.markField(x, y)
 		testWrapper.AssertExpectations(t)
 		assert.Equal(t, expectedError, err)
+	})
+}
+
+func TestGame_winner(t *testing.T) {
+	testWrapper := new(MockGameWrapper)
+	t.Run("should return player 1 win the game", func(t *testing.T) {
+		g := Init(&player1, &player2, testWrapper)
+		testWrapper.On("Win").Return(true, player1.Mark, nil)
+		winner, err := g.winner()
+		assert.Equal(t, &player1, winner)
+		assert.Nil(t, err)
+	})
+	t.Run("should return player 2 win the game", func(t *testing.T) {
+		g := Init(&player1, &player2, testWrapper)
+		testWrapper.On("Win").Return(true, player2.Mark, nil)
+		winner, err := g.winner()
+		assert.Equal(t, &player2, winner)
+		assert.Nil(t, err)
 	})
 }

@@ -9,6 +9,7 @@ const indexWaitingPlayer = 1
 
 type GameAPI interface {
 	Mark(x, y int, mark string) error
+	Win() (bool, string, error)
 }
 
 type Game struct {
@@ -34,4 +35,16 @@ func (g *Game) switchTurnPlayer() {
 func (g *Game) markField(x, y int) error {
 	err := g.board.Mark(x, y, g.players[0].Mark)
 	return err
+}
+
+func (g *Game) winner() (*player.Player, error) {
+	win, mark, _ := g.board.Win()
+	if win {
+		for _, p := range g.players {
+			if p.Mark == mark {
+				return p, nil
+			}
+		}
+	}
+	return nil, nil
 }
