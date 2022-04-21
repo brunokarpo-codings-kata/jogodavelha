@@ -8,7 +8,7 @@ import (
 const indexTurnPlayer = 0
 const indexWaitingPlayer = 1
 
-var noWinnerError = errors.New("no winner yet")
+var NoWinnerError = errors.New("no winner yet")
 
 type GameAPI interface {
 	Mark(x, y int, mark string) error
@@ -37,7 +37,7 @@ func (g *Game) Play(x, y int) (*player.Player, error) {
 		return nil, err
 	}
 	winner, err := g.winner()
-	if err != nil && err != noWinnerError {
+	if err != nil && err != NoWinnerError {
 		return nil, err
 	}
 	if winner != nil {
@@ -68,5 +68,5 @@ func (g *Game) winner() (*player.Player, error) {
 			}
 		}
 	}
-	return nil, noWinnerError
+	return nil, NoWinnerError
 }

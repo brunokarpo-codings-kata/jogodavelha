@@ -6,6 +6,7 @@ import (
 )
 
 var emptyField = "-"
+var DeuVelhaError = errors.New("deu velha")
 
 type fields [3][3]string
 
@@ -25,12 +26,13 @@ func Init() *Board {
 
 func (b *Board) Mark(x, y int, mark string) (err error) {
 	if x < 0 || y < 0 ||
-		x > 3 || y > 3 {
+		x > 2 || y > 2 {
 		err = errors.New("invalid fields")
 		return
 	}
 	if b.fields[x][y] != emptyField {
 		err = errors.New("field already marked")
+		return
 	}
 	b.fields[x][y] = mark
 	return
@@ -120,5 +122,5 @@ func (b *Board) allFieldMarked(c chan winner) {
 			}
 		}
 	}
-	c <- winner{false, "", errors.New("deu velha")}
+	c <- winner{false, "", DeuVelhaError}
 }

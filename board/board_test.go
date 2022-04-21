@@ -1,6 +1,9 @@
 package board
 
-import "testing"
+import (
+	"github.com/stretchr/testify/assert"
+	"testing"
+)
 
 func TestBoard_Mark(t *testing.T) {
 	t.Run("should mark all valid fields", func(t *testing.T) {
@@ -10,10 +13,7 @@ func TestBoard_Mark(t *testing.T) {
 				mark := "X"
 				_ = b.Mark(x, y, mark)
 
-				if b.fields[x][y] != mark {
-					t.Logf("error: field [%v][%v] should have value '%v', but got: '%v'", x, y, mark, b.fields[x][y])
-					t.Fail()
-				}
+				assert.Equal(t, mark, b.fields[x][y], "error: field [%v][%v] should have value '%v', but got: '%v'", x, y, mark, b.fields[x][y])
 			}
 		}
 	})
@@ -24,24 +24,18 @@ func TestBoard_Mark(t *testing.T) {
 				mark := "X"
 
 				err := b.Mark(x, y, mark)
-				if err == nil {
-					t.Logf("expected error while trying to mark field [%v][%v], but not occours", x, y)
-					t.Fail()
-				}
+				assert.NotNil(t, err, "expected error while trying to mark field [%v][%v], but not occours", x, y)
 			}
 		}
 	})
 	t.Run("Should not mark invalid positive fields", func(t *testing.T) {
 		b := Init()
-		for x := 4; x < 10; x++ {
-			for y := 4; y < 10; y++ {
+		for x := 3; x < 10; x++ {
+			for y := 3; y < 10; y++ {
 				mark := "X"
 
 				err := b.Mark(x, y, mark)
-				if err == nil {
-					t.Logf("expected error while trying to mark field [%v][%v], but not occours", x, y)
-					t.Fail()
-				}
+				assert.NotNil(t, err, "expected error while trying to mark field [%v][%v], but not occours", x, y)
 			}
 		}
 	})
@@ -55,10 +49,8 @@ func TestBoard_Mark(t *testing.T) {
 
 				mark2 := "O"
 				err := b.Mark(x, y, mark2)
-				if err == nil {
-					t.Logf("expected error. the field [%v][%v] should be marked with '%v', but got '%v'", x, y, mark, b.fields[x][y])
-					t.Fail()
-				}
+				assert.NotNil(t, err, "expected error. the field [%v][%v] should be marked with '%v', but got '%v'", x, y, mark, b.fields[x][y])
+				assert.Equal(t, mark, b.fields[x][y], "the field [%v][%v] should keep marked with mark %v, but got %v", x, y, mark, b.fields[x][y])
 			}
 		}
 	})
@@ -68,14 +60,8 @@ func TestBoard_Win(t *testing.T) {
 	t.Run("empty board should not have winner", func(t *testing.T) {
 		b := Init()
 		win, mark, _ := b.Win()
-		if win {
-			t.Log("error: the board should not have winner")
-			t.Fail()
-		}
-		if mark == "-" {
-			t.Logf("The mark '%v' is not a valid mark to win the game", mark)
-			t.Fail()
-		}
+		assert.False(t, win, "error: the board should not have winner")
+		assert.NotEqual(t, "-", mark, "The mark '%v' is not a valid mark to win the game", mark)
 	})
 	t.Run("should win in horizontal", func(t *testing.T) {
 		mark := "X"
@@ -89,13 +75,8 @@ func TestBoard_Win(t *testing.T) {
 
 			win, m, _ := b.Win()
 
-			if !win {
-				t.Log("error: the board should have a winner")
-				t.Fail()
-			}
-			if m != mark {
-				t.Logf("The mark '%v' should won the game, but got the mark '%v'", mark, m)
-			}
+			assert.True(t, win, "error: the board should have a winner")
+			assert.Equal(t, mark, m, "The mark '%v' should won the game, but got the mark '%v'", mark, m)
 		}
 	})
 	t.Run("should win in vertical", func(t *testing.T) {
@@ -110,13 +91,8 @@ func TestBoard_Win(t *testing.T) {
 
 			win, m, _ := b.Win()
 
-			if !win {
-				t.Log("error: the board should have a winner")
-				t.Fail()
-			}
-			if m != mark {
-				t.Logf("The mark '%v' should won the game, but got the mark '%v'", mark, m)
-			}
+			assert.True(t, win, "error: the board should have a winner")
+			assert.Equal(t, mark, m, "The mark '%v' should won the game, but got the mark '%v'", mark, m)
 		}
 	})
 	t.Run("Should win in diagonal right", func(t *testing.T) {
@@ -130,13 +106,8 @@ func TestBoard_Win(t *testing.T) {
 
 		win, m, _ := b.Win()
 
-		if !win {
-			t.Log("error: the board should have a winner")
-			t.Fail()
-		}
-		if m != mark {
-			t.Logf("The mark '%v' should won the game, but got the mark '%v'", mark, m)
-		}
+		assert.True(t, win, "error: the board should have a winner")
+		assert.Equal(t, mark, m, "The mark '%v' should won the game, but got the mark '%v'", mark, m)
 	})
 	t.Run("should win in diagonal left", func(t *testing.T) {
 		mark := "S"
@@ -149,13 +120,8 @@ func TestBoard_Win(t *testing.T) {
 
 		win, m, _ := b.Win()
 
-		if !win {
-			t.Log("error: the board should have a winner")
-			t.Fail()
-		}
-		if m != mark {
-			t.Logf("The mark '%v' should won the game, but got the mark '%v'", mark, m)
-		}
+		assert.True(t, win, "error: the board should have a winner")
+		assert.Equal(t, mark, m, "The mark '%v' should won the game, but got the mark '%v'", mark, m)
 	})
 	t.Run("Should fail if all field is filled and no winner", func(t *testing.T) {
 		b := Init()
@@ -166,17 +132,9 @@ func TestBoard_Win(t *testing.T) {
 		}
 
 		win, mark, err := b.Win()
-		if win {
-			t.Log("error: the board should not have winner")
-			t.Fail()
-		}
-		if mark != "" {
-			t.Logf("The mark '%v' is not a valid mark to win the game", mark)
-			t.Fail()
-		}
-		if err == nil {
-			t.Logf("error expected when field is fully filled and no winner mark")
-			t.Fail()
-		}
+
+		assert.False(t, win, "error: the board should not have winner")
+		assert.Equal(t, "", mark, "The mark '%v' is not a valid mark to win the game", mark)
+		assert.NotNil(t, err, "error expected when field is fully filled and no winner mark")
 	})
 }
