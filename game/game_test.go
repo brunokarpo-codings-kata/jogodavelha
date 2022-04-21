@@ -64,7 +64,7 @@ func TestGame_GetTheTurnPlayer(t *testing.T) {
 	})
 }
 
-func TestGame_MarkField(t *testing.T) {
+func TestGame_markField(t *testing.T) {
 	testWrapper := new(MockGameWrapper)
 	x, y := 0, 0
 	t.Run("turn player should mark a valid field", func(t *testing.T) {
@@ -85,8 +85,8 @@ func TestGame_MarkField(t *testing.T) {
 }
 
 func TestGame_winner(t *testing.T) {
-	testWrapper := new(MockGameWrapper)
 	t.Run("should return player 1 win the game", func(t *testing.T) {
+		testWrapper := new(MockGameWrapper)
 		g := Init(&player1, &player2, testWrapper)
 		testWrapper.On("Win").Return(true, player1.Mark, nil)
 		winner, err := g.winner()
@@ -94,10 +94,29 @@ func TestGame_winner(t *testing.T) {
 		assert.Nil(t, err)
 	})
 	t.Run("should return player 2 win the game", func(t *testing.T) {
+		testWrapper := new(MockGameWrapper)
 		g := Init(&player1, &player2, testWrapper)
 		testWrapper.On("Win").Return(true, player2.Mark, nil)
 		winner, err := g.winner()
 		assert.Equal(t, &player2, winner)
 		assert.Nil(t, err)
+	})
+	t.Run("should return error when game has no winner yet", func(t *testing.T) {
+		testWrapper := new(MockGameWrapper)
+		g := Init(&player1, &player2, testWrapper)
+		expectedError := errors.New("no winner yet")
+		testWrapper.On("Win").Return(false, "", nil)
+		winner, err := g.winner()
+		assert.Nil(t, winner)
+		assert.Equal(t, expectedError, err)
+	})
+	t.Run("should return board error when win method emit error", func(t *testing.T) {
+		testWrapper := new(MockGameWrapper)
+		g := Init(&player1, &player2, testWrapper)
+		expectedError := errors.New("board error")
+		testWrapper.On("Win").Return(false, "", expectedError)
+		winner, err := g.winner()
+		assert.Nil(t, winner)
+		assert.Equal(t, expectedError, err)
 	})
 }

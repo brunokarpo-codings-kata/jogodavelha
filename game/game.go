@@ -1,6 +1,7 @@
 package game
 
 import (
+	"errors"
 	"github.com/brunokarpo-codings-kata/jogodavelha/player"
 )
 
@@ -38,7 +39,10 @@ func (g *Game) markField(x, y int) error {
 }
 
 func (g *Game) winner() (*player.Player, error) {
-	win, mark, _ := g.board.Win()
+	win, mark, err := g.board.Win()
+	if err != nil {
+		return nil, err
+	}
 	if win {
 		for _, p := range g.players {
 			if p.Mark == mark {
@@ -46,5 +50,5 @@ func (g *Game) winner() (*player.Player, error) {
 			}
 		}
 	}
-	return nil, nil
+	return nil, errors.New("no winner yet")
 }
