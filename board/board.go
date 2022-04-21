@@ -1,6 +1,9 @@
 package board
 
-import "errors"
+import (
+	"errors"
+	"fmt"
+)
 
 var emptyField = "-"
 
@@ -31,6 +34,14 @@ func (b *Board) Mark(x, y int, mark string) (err error) {
 	}
 	b.fields[x][y] = mark
 	return
+}
+
+func (b *Board) PrintBoard() {
+	fmt.Printf(" %v | %v | %v \n", b.fields[0][0], b.fields[0][1], b.fields[0][2])
+	fmt.Println("---|---|---")
+	fmt.Printf(" %v | %v | %v \n", b.fields[1][0], b.fields[1][1], b.fields[1][2])
+	fmt.Println("---|---|---")
+	fmt.Printf(" %v | %v | %v \n", b.fields[2][0], b.fields[2][1], b.fields[2][2])
 }
 
 type winner struct {
